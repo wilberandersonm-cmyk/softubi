@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Softubi Games · Administración</title>
+<link rel="icon" href="logo.png">
+<style>
+*{box-sizing:border-box}
+body{background:#f7f7f9;color:#1b1b1f;font-family:system-ui,sans-serif;padding:24px 16px;text-align:center}
+.box{background:#fff;padding:24px;border-radius:18px;border-top:8px solid #e4000f;box-shadow:0 10px 30px #0002;max-width:760px;margin:auto}
+input,button{padding:12px;border-radius:10px;font-size:1rem;margin:6px}
+input{border:2px solid #ccc}
+button{background:#e4000f;color:#fff;font-weight:700;cursor:pointer;border:0}
+table{width:100%;border-collapse:collapse;margin-top:16px;text-align:left}
+th{background:#e4000f;color:#fff;padding:10px}td{padding:10px;border-bottom:1px solid #eee}
+.ok{color:#0a8f3c;font-weight:700}.no{color:#e4000f;font-weight:700}
+#res{display:none}.n{font-size:1.2rem;font-weight:700;margin-top:14px}
+</style></head><body>
+<div class="box">
+  <img src="logo.png" width="100" alt="">
+  <h1>Administración</h1>
+  <div id="login"><input id="pin" type="password" placeholder="PIN del staff"><button id="b">Entrar</button><p id="err"></p></div>
+  <div id="res">
+    <div class="n" id="cnt"></div>
+    <table><thead><tr><th>#</th><th>Nombre</th><th>Especialidad</th><th>Registro</th><th>Ticket</th></tr></thead><tbody id="tb"></tbody></table>
+    <p><small>Se actualiza sola cada 8 segundos.</small></p>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const db=supabase.createClient("https://bihyxeyvljfpwrczgmpr.supabase.co","sb_publishable_yjn4gF6BRjlvmHsMBFy7vA_FMUomm5C");
+let PIN="",timer;
+async function cargar(){
+  const {data,error}=await db.rpc('listar_tickets',{p_pin:PIN});
+  if(error||!data){err.textContent='❌ PIN incorrecto o error';clearInterval(timer);login.style.display='block';res.style.display='none';return}
+  login.style.display='none';res.style.display='block';
+  cnt.textContent=`${data.length} de 10 tickets · ${data.filter(t=>t.usado).length} usados`;
+  tb.innerHTML='';
+  data.forEach((t,i)=>{
+    const tr=document.createElement('tr');
+    [i+1,t.nombre,t.especialidad,new Date(t.creado).toLocaleString()].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});
+    const td=document.createElement('td');td.textContent=t.usado?'Usado':'Sin usar';td.className=t.usado?'no':'ok';tr.appendChild(td);
+    tb.appendChild(tr);
+  });
+}
+b.onclick=()=>{PIN=pin.value;err.textContent='';cargar();clearInterval(timer);timer=setInterval(cargar,8000)};
+</script></body></html>

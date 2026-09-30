@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Softubi Games · Juegos</title>
+<link rel="icon" href="logo.png">
+<style>
+:root{--a:#e4000f;--b:#ff8a8a}
+*{box-sizing:border-box;margin:0}
+body{min-height:100vh;background:#f7f7f9;color:#1b1b1f;font-family:system-ui,sans-serif;padding:24px 16px 40px;text-align:center}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(circle at 12% 15%,var(--a) 0,transparent 42%),radial-gradient(circle at 88% 85%,var(--b) 0,transparent 42%);opacity:.22;transition:all .5s}
+.logo{width:120px;margin-bottom:6px}
+h1{font-size:1.3rem;letter-spacing:4px;font-weight:600;margin-bottom:26px}
+.grid{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;max-width:1100px;margin:auto}
+.juego{position:relative;width:min(320px,100%);aspect-ratio:3/4;border-radius:18px;overflow:hidden;display:block;color:#fff;text-decoration:none;border:4px solid #fff;background:linear-gradient(160deg,var(--c1),var(--c2));box-shadow:0 8px 24px #0003;transition:transform .25s,box-shadow .25s}
+.juego:hover{transform:translateY(-6px);box-shadow:0 14px 36px var(--c1)}
+.juego img,.juego video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.juego video{opacity:0;transition:opacity .3s}
+.juego:hover video{opacity:1}
+.juego .nombre{position:absolute;left:0;right:0;bottom:0;padding:40px 14px 16px;font-size:1.3rem;font-weight:800;text-shadow:0 2px 8px #000;background:linear-gradient(transparent,#000c)}
+</style></head><body>
+<img class="logo" src="logo.png" alt="Softubi Games">
+<h1>NUESTROS JUEGOS</h1>
+<div class="grid" id="g"></div>
+<script>
+/* Un bloque por juego: nombre, imagen de portada, video (al pasar el cursor),
+   enlace (a donde lleva el clic) y colores de ambientación. */
+const JUEGOS=[
+ {nombre:"Juego 1",imagen:"juego1.jpg",video:"juego1.mp4",enlace:"juego1.html",c1:"#e4000f",c2:"#ff5a5a"},
+ {nombre:"Juego 2",imagen:"juego2.jpg",video:"juego2.mp4",enlace:"juego2.html",c1:"#b0000c",c2:"#e4000f"},
+ {nombre:"Juego 3",imagen:"juego3.jpg",video:"juego3.mp4",enlace:"juego3.html",c1:"#ff2d3d",c2:"#ff8a8a"},
+ {nombre:"Juego 4",imagen:"juego4.jpg",video:"juego4.mp4",enlace:"juego4.html",c1:"#8a0009",c2:"#e4000f"},
+ {nombre:"Juego 5",imagen:"juego5.jpg",video:"juego5.mp4",enlace:"juego5.html",c1:"#ff3b47",c2:"#ff9aa0"}
+];
+const g=document.getElementById('g'),r=document.documentElement.style;
+JUEGOS.forEach(j=>{
+  const a=document.createElement('a');a.className='juego';a.href=j.enlace;
+  a.style.setProperty('--c1',j.c1);a.style.setProperty('--c2',j.c2);
+  a.innerHTML=`<img src="${j.imagen}" alt="" onerror="this.remove()"><video src="${j.video}" muted loop playsinline preload="none" onerror="this.remove()"></video><div class="nombre">${j.nombre}</div>`;
+  const v=()=>a.querySelector('video');
+  a.onmouseenter=()=>{r.setProperty('--a',j.c1);r.setProperty('--b',j.c2);const x=v();x&&x.play().catch(()=>{})};
+  a.onmouseleave=()=>{r.setProperty('--a','#e4000f');r.setProperty('--b','#ff8a8a');const x=v();x&&(x.pause(),x.currentTime=0)};
+  g.appendChild(a);
+});
+</script></body></html>

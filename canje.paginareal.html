@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Softubi Games · Canje</title>
+<link rel="icon" href="logo.png">
+<style>
+*{box-sizing:border-box}
+body{background:#f7f7f9;color:#1b1b1f;font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;text-align:center;padding:20px}
+.box{background:#fff;padding:28px;border-radius:18px;border-top:8px solid #e4000f;box-shadow:0 10px 30px #0002;width:min(380px,100%)}
+input,button{padding:12px;border-radius:10px;font-size:1rem;margin:6px 0;width:100%}
+input{border:2px solid #ccc}
+button{background:#e4000f;color:#fff;font-weight:700;cursor:pointer;border:0}
+#r{font-size:1.5rem;margin-top:14px;font-weight:700}
+</style></head><body>
+<div class="box">
+  <img src="logo.png" width="110" alt="">
+  <h1>Canje de ticket</h1>
+  <p>Solo personal de Softubi Games</p>
+  <input id="pin" type="password" placeholder="PIN del staff">
+  <button id="b">Validar ticket</button>
+  <div id="r"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const db=supabase.createClient("https://bihyxeyvljfpwrczgmpr.supabase.co","sb_publishable_yjn4gF6BRjlvmHsMBFy7vA_FMUomm5C");
+const code=new URLSearchParams(location.search).get('c');
+b.onclick=async()=>{
+  if(!code){r.textContent='❌ Sin código';return}
+  const {data,error}=await db.rpc('canjear_ticket',{p_codigo:code,p_pin:pin.value});
+  r.textContent=error?'⚠️ Error':(data==='ok'?'✅ Válido, ¡ticket anulado!':data==='usado'?'❌ Ya fue usado':'❌ Inválido o PIN incorrecto');
+};
+</script></body></html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Softubi Games</title>
+<link rel="icon" href="logo.png">
+<style>
+:root{--red:#e4000f;--a:#e4000f;--b:#ff8a8a;--bg:#f7f7f9;--ink:#1b1b1f}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(circle at 12% 18%,var(--a) 0,transparent 42%),radial-gradient(circle at 88% 82%,var(--b) 0,transparent 42%);opacity:.22;transition:all .8s}
+.top{display:flex;align-items:center;gap:10px;padding:14px 20px}
+.top img{height:38px}.top b{letter-spacing:3px;font-weight:600}
+/* HERO */
+.hero{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:26px;text-align:center}
+.consola{--x:0;--y:0;display:flex;width:min(980px,100%);filter:drop-shadow(0 25px 35px #0005);
+ transform:perspective(1100px) rotateY(calc(var(--x)*16deg)) rotateX(calc(var(--y)*-9deg)) translateX(calc(var(--x)*30px));transition:transform .25s ease-out}
+.joy{width:clamp(38px,7vw,72px);border-radius:40px 0 0 40px;background:#fff;border:3px solid #ddd;border-right:0;position:relative}
+.joy.r{background:var(--red);border:3px solid #b0000c;border-left:0;border-radius:0 40px 40px 0}
+.joy::after{content:"";position:absolute;left:50%;top:22%;width:44%;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:#222;box-shadow:0 0 0 4px #0002}
+.joy.r::after{top:auto;bottom:22%}
+.pantalla{flex:1;background:#fff;border:10px solid #111;position:relative;aspect-ratio:16/9;display:grid;place-items:center;overflow:hidden}
+.pantalla video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pantalla .logo{width:min(34%,230px);position:relative;transform:translateX(calc(var(--x)*-14px));transition:transform .25s}
+.pantalla::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,#fff8 0,transparent 30%);pointer-events:none}
+.tag{font-size:clamp(1rem,2.5vw,1.4rem)}
+.redes{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.btn{padding:12px 28px;border-radius:40px;text-decoration:none;font-weight:700;border:3px solid var(--red);cursor:pointer;font-size:1rem;transition:.2s;box-shadow:0 5px 0 #0003}
+.btn:hover{transform:translateY(-3px) scale(1.06)}
+.ig{background:var(--red);color:#fff}.tt{background:#fff;color:var(--red)}
+.flecha{font-size:2rem;color:var(--red);animation:rebota 1.2s infinite}
+/* JUEGOS */
+section{padding:50px 20px;max-width:1000px;margin:auto}
+h2{margin-bottom:8px;border-left:8px solid var(--a);padding-left:12px;transition:border-color .8s}
+.cd{opacity:.8;margin:0 0 22px 20px;font-weight:600}
+.juegos{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px}
+.tile{position:relative;aspect-ratio:4/3;border-radius:16px;overflow:hidden;cursor:pointer;border:3px solid #0001;display:grid;place-items:center;text-align:center;padding:14px;transition:.3s;opacity:0;transform:translateY(30px);color:#fff}
+.tile.v{opacity:1;transform:none}
+.tile.on{background:linear-gradient(135deg,var(--c1),var(--c2))}
+.tile.on:hover{transform:scale(1.05);box-shadow:0 10px 28px var(--c1)}
+.tile.sel{border-color:#fff;outline:4px solid var(--c1)}
+.tile.lock{cursor:default;background:repeating-linear-gradient(45deg,#ececf0 0 12px,#e2e2e8 12px 24px);color:#666}
+.tile .q{font-size:3rem;opacity:.5}.tile .fecha{font-size:.8rem}
+.tile h3{font-size:1.2rem;text-shadow:0 2px 6px #0006}
+.desc{position:absolute;inset:0;background:#000d;padding:14px;display:grid;place-items:center;font-size:.9rem;transform:translateY(100%);transition:.3s}
+.tile:hover .desc{transform:none}
+#detalle{display:none;margin-top:30px;background:#fff;border-radius:18px;overflow:hidden;border-top:6px solid var(--a);box-shadow:0 10px 30px #0002;animation:entra .5s}
+#detalle .vid{aspect-ratio:16/9;background:#000;display:grid;place-items:center;color:#fff}
+#detalle video{width:100%;height:100%}
+#detalle .txt{padding:20px}
+/* TICKET */
+form{display:grid;gap:12px;background:#fff;padding:24px;border-radius:16px;box-shadow:0 10px 30px #0002}
+input{padding:12px;border-radius:10px;border:2px solid #ccc;font-size:1rem}
+input:focus{outline:none;border-color:var(--red)}
+#ticket{display:none;text-align:center;background:#fff;padding:20px;border-radius:16px;margin-top:16px;border:4px solid var(--red);animation:entra .5s}
+#qr{display:inline-block;margin:10px}
+@keyframes rebota{50%{transform:translateY(10px)}}
+@keyframes entra{from{opacity:0;transform:translateY(20px)}}
+</style></head><body>
+
+<div class="top"><img src="logo.png" alt=""><b>SOFTUBI GAMES</b></div>
+
+<header class="hero" id="hero">
+  <div class="consola" id="consola">
+    <div class="joy"></div>
+    <div class="pantalla">
+      <img class="logo" src="logo.png" alt="Softubi Games">
+      <!-- descomenta y pon tu video (mp4 sin marca de agua) -->
+      <!-- <video src="video.mp4" autoplay muted loop playsinline></video> -->
+    </div>
+    <div class="joy r"></div>
+  </div>
+  <p class="tag">Cada día revelamos juegos nuevos 🎮</p>
+  <div class="redes">
+    <a class="btn ig" href="https://www.instagram.com/softubi_games" target="_blank" rel="noopener">Instagram</a>
+    <a class="btn tt" href="https://www.tiktok.com/@softubigames" target="_blank" rel="noopener">TikTok</a>
+  </div>
+  <div class="flecha">⌄</div>
+</header>
+
+<section>
+  <h2>Los juegos</h2>
+  <p class="cd" id="cd"></p>
+  <div class="juegos" id="juegos"></div>
+  <div id="detalle"><div class="vid" id="dvid"></div><div class="txt"><h3 id="dn"></h3><p id="dd"></p></div></div>
+</section>
+
+<section>
+  <h2>🎟️ Ticket gratis (solo los primeros 10)</h2>
+  <form id="f">
+    <input id="nombre" placeholder="Tu nombre" required maxlength="60">
+    <input id="esp" placeholder="Tu especialidad" required maxlength="60">
+    <button class="btn ig" type="submit">Obtener mi ticket</button>
+  </form>
+  <div id="ticket"><h3>¡Tu ticket!</h3><div id="qr"></div>
+    <p id="msg"></p><p><small>Guarda una captura. Solo se puede usar una vez.</small></p></div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const SUPABASE_URL="https://bihyxeyvljfpwrczgmpr.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_yjn4gF6BRjlvmHsMBFy7vA_FMUomm5C";
+const CANJE_URL="https://TU-USUARIO.github.io/softubi-web/canje.html";
+
+/* ===== TUS JUEGOS =====
+ fecha = día en que se revela (AAAA-MM-DD). Dos juegos con la misma fecha salen juntos.
+ video = archivo mp4 ("" si aún no hay). c1/c2 = colores de ambientación (tonos de rojo). */
+const JUEGOS=[
+ {fecha:"2026-09-30",nombre:"Juego 1",desc:"Descripción del primer juego.",video:"juego1.mp4",c1:"#e4000f",c2:"#ff5a5a"},
+ {fecha:"2026-10-01",nombre:"Juego 2",desc:"Descripción del segundo juego.",video:"",c1:"#b0000c",c2:"#e4000f"},
+ {fecha:"2026-10-01",nombre:"Juego 3",desc:"Descripción del tercer juego.",video:"",c1:"#ff2d3d",c2:"#ff8a8a"},
+ {fecha:"2026-10-02",nombre:"Juego 4",desc:"Descripción del cuarto juego.",video:"",c1:"#8a0009",c2:"#e4000f"},
+ {fecha:"2026-10-02",nombre:"Juego 5",desc:"Descripción del quinto juego.",video:"",c1:"#ff3b47",c2:"#ff9aa0"}
+];
+// para probar fechas: index.html?ver=2026-10-01
+const ver=new URLSearchParams(location.search).get('ver');
+const ahora=()=>ver?new Date(ver+"T12:00:00"):new Date();
+const abre=j=>new Date(j.fecha+"T00:00:00");
+const cont=document.getElementById('juegos');
+const io=new IntersectionObserver(e=>e.forEach(x=>x.isIntersecting&&x.target.classList.add('v')),{threshold:.15});
+
+function pintar(){
+  cont.innerHTML="";
+  JUEGOS.forEach((j,i)=>{
+    const t=document.createElement('div');t.className='tile';t.style.transitionDelay=(i*80)+'ms';
+    if(ahora()>=abre(j)){
+      t.classList.add('on');t.style.setProperty('--c1',j.c1);t.style.setProperty('--c2',j.c2);
+      t.innerHTML=`<h3>${j.nombre}</h3><div class="desc">${j.desc}</div>`;
+      t.onclick=()=>elegir(j,t);
+    }else{
+      t.classList.add('lock');
+      t.innerHTML=`<div><div class="q">?</div><div class="fecha">Se revela el ${j.fecha.split('-').reverse().join('/')}</div></div>`;
+    }
+    cont.appendChild(t);io.observe(t);
+  });
+  const prox=JUEGOS.find(j=>ahora()<abre(j));
+  const cd=document.getElementById('cd');
+  if(!prox){cd.textContent="¡Todos los juegos revelados!";return}
+  const tick=()=>{let s=Math.max(0,Math.floor((abre(prox)-ahora())/1000));
+    const p=n=>String(n).padStart(2,'0');
+    cd.textContent=`Próxima revelación en ${Math.floor(s/86400)}d ${p(Math.floor(s%86400/3600))}:${p(Math.floor(s%3600/60))}:${p(s%60)}`;};
+  tick();if(!ver)setInterval(tick,1000);
+}
+function elegir(j,t){
+  document.querySelectorAll('.tile').forEach(x=>x.classList.remove('sel'));t.classList.add('sel');
+  const r=document.documentElement.style;r.setProperty('--a',j.c1);r.setProperty('--b',j.c2);
+  document.getElementById('dn').textContent=j.nombre;document.getElementById('dd').textContent=j.desc;
+  document.getElementById('dvid').innerHTML=j.video?`<video src="${j.video}" controls autoplay muted loop playsinline></video>`:'<span>🎬 Video próximamente</span>';
+  const d=document.getElementById('detalle');d.style.display='block';d.style.animation='none';d.offsetHeight;d.style.animation='';
+  d.scrollIntoView({behavior:'smooth',block:'center'});
+}
+pintar();
+
+// La consola se mueve hacia donde esté el cursor
+const hero=document.getElementById('hero'),con=document.getElementById('consola');
+hero.addEventListener('pointermove',e=>{const r=hero.getBoundingClientRect();
+  con.style.setProperty('--x',(((e.clientX-r.left)/r.width-.5)*2).toFixed(3));
+  con.style.setProperty('--y',(((e.clientY-r.top)/r.height-.5)*2).toFixed(3));});
+hero.addEventListener('pointerleave',()=>{con.style.setProperty('--x',0);con.style.setProperty('--y',0)});
+
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+function mostrarTicket(codigo,nom){
+  document.getElementById('f').style.display='none';
+  document.getElementById('ticket').style.display='block';
+  document.getElementById('msg').textContent='A nombre de: '+nom;
+  document.getElementById('qr').innerHTML='';
+  new QRCode(document.getElementById('qr'),{text:CANJE_URL+'?c='+codigo,width:200,height:200});
+}
+// Si este dispositivo ya obtuvo su ticket, se lo vuelve a mostrar
+try{const g=JSON.parse(localStorage.getItem('softubi_ticket')||'null');if(g&&g.c)mostrarTicket(g.c,g.n)}catch(e){}
+
+document.getElementById('f').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const b=e.target.querySelector('button');b.disabled=true;
+  const {data,error}=await db.rpc('reclamar_ticket',{p_nombre:nombre.value.trim(),p_especialidad:esp.value.trim()});
+  b.disabled=false;
+  if(error){alert('Hubo un error, intenta de nuevo.');return}
+  if(data==='agotado'){alert('Los 10 tickets ya se agotaron.');return}
+  if(data==='ya_registrado'){alert('Ya hay un ticket registrado con ese nombre o desde esta conexión. Es uno por persona.');return}
+  try{localStorage.setItem('softubi_ticket',JSON.stringify({c:data,n:nombre.value.trim()}))}catch(e){}
+  mostrarTicket(data,nombre.value.trim());
+});
+</script>
+</body></html>
